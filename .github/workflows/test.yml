@@ -10,12 +10,12 @@ jobs:
         image: mongo
     steps:
       - uses: actions/checkout@v1
-      - name: get container name
-        run: export CONTAINER=$(docker ps -aqf "name=mongo")
       - name: import data to mongo
         run: |
+          export CONTAINER=$(docker ps -aqf "name=mongo")
           docker cp testcol.json $CONTAINER:/tmp/testcol.json
           docker exec $CONTAINER mongoimport -d test -c testcol --file /tmp/testcol.json
       - name: print data from mongo
         run: |
+          export CONTAINER=$(docker ps -aqf "name=mongo")
           docker exec $CONTAINER mongoexport -d test -c testcol
