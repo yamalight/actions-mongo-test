@@ -13,18 +13,12 @@ jobs:
       - uses: actions/checkout@v1
       - name: import data to mongo
         run: |
-          docker cp testcol.json mongodb:/tmp/testcol.json
-          docker exec mongodb mongoimport -d test -c testcol --file /tmp/testcol.json
+          docker cp testcol.json $CONTAINER:/tmp/testcol.json
+          docker exec $CONTAINER mongoimport -d test -c testcol --file /tmp/testcol.json
         env:
-          # use mongodb for the host here because we have specified a container for the job.
-          # If we were running the job on the VM this would be localhost
-          MONGODB_HOST: mongodb
-          MONGODB_PORT: ${{ job.services.mongodb.ports[27017] }}
+          CONTAINER: ${{ job.services.mongodb.name }}
       - name: print data from mongo
         run: |
-          docker exec mongodb mongoexport -d test -c testcol
+          docker exec $CONTAINER mongoexport -d test -c testcol
         env:
-          # use mongodb for the host here because we have specified a container for the job.
-          # If we were running the job on the VM this would be localhost
-          MONGODB_HOST: mongodb
-          MONGODB_PORT: ${{ job.services.mongodb.ports[27017] }}
+          CONTAINER: ${{ job.services.mongodb.name }}
