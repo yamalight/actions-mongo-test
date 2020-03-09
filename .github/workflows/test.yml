@@ -8,17 +8,14 @@ jobs:
     services:
       mongodb:
         image: mongo
-
     steps:
       - uses: actions/checkout@v1
+      - name: get container name
+        run: export CONTAINER=$(docker ps -aqf "name=mongo")
       - name: import data to mongo
         run: |
           docker cp testcol.json $CONTAINER:/tmp/testcol.json
           docker exec $CONTAINER mongoimport -d test -c testcol --file /tmp/testcol.json
-        env:
-          CONTAINER: ${{ job.services.mongodb.name }}
       - name: print data from mongo
         run: |
           docker exec $CONTAINER mongoexport -d test -c testcol
-        env:
-          CONTAINER: ${{ job.services.mongodb.name }}
